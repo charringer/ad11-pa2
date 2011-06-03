@@ -1,0 +1,35 @@
+<project default='all' xmlns:ac="antlib:net.sf.antcontrib">
+  <target name='build'>
+    <mkdir dir='build'/>
+    <copy todir='build'>
+      <fileset dir='binary_libs'/>
+    </copy>
+    <javac srcdir='src' destdir='build' source='1.6' target='1.6'
+      includeantruntime='no' deprecation='yes' debug='yes'>
+      <compilerarg value="-Xlint"/>
+    </javac>
+  </target>
+
+  <target name='clean'>
+    <delete dir='build'/>
+  </target>
+
+  <target name='run' depends='build'>
+    <java classpath='build' classname='ads1ss11.pa2.Main' fork='true'/>
+  </target>
+
+  <target name='test'>
+    <ac:for param='file'>
+      <path>
+        <fileset dir='testdata' includes='*'/>
+      </path>
+      <ac:sequential>
+	<echo>Testing @{file}</echo>
+	<exec executable='sh'>
+	  <arg value='-c'/>
+	  <arg value='java -cp build ads1ss11.pa2.Main &lt; @{file}'/>
+	</exec>
+      </ac:sequential>
+    </ac:for>
+  </target>
+</project>
