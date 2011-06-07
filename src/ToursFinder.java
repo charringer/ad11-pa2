@@ -51,7 +51,8 @@ public class ToursFinder extends AbstractToursFinder {
 
 	@Override
 	public ArrayList<ArrayList<Integer>> findTours1() {
-		return null;
+		ArrayList<ArrayList<Integer>> paths = brainlessDivision();
+		return paths;
 	}
 
 	@Override
@@ -62,6 +63,43 @@ public class ToursFinder extends AbstractToursFinder {
 	@Override
 	public ArrayList<ArrayList<Integer>> findTours3() {
 		return null;
+	}
+
+	private ArrayList<ArrayList<Integer>> brainlessDivision() {
+		ArrayList<Integer> tour1 = new ArrayList<Integer>(numNodes);
+		ArrayList<Integer> tour2 = new ArrayList<Integer>(numNodes);
+		for (int i=0;i<numNodes;i++)
+			tour1.add(i);
+		if ((numNodes % 2) == 1) {
+			for (int i=0;i<numNodes;i++)
+				tour2.add((2*i) % numNodes);
+		} else {
+			for (int i=0;i<numNodes;i++)
+				tour2.add(modulo(((i<numNodes/2)?(2*i):(1-2*i)),numNodes));
+		}
+		return listOf2Lists(tour1, tour2);
+	}
+
+	private int modulo(int x, int n) {
+		return ((x%n)+n)%n;
+	}
+
+	private ArrayList<ArrayList<Integer>> listOf2Lists(ArrayList<Integer> list1, ArrayList<Integer> list2) {
+		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+		result.add(list1);
+		result.add(list2);
+		return result;
+	}
+
+	private ArrayList<Integer> intArray2ArrayList(int[] array, int length) {
+		ArrayList<Integer> list = new ArrayList<Integer>(length);
+		for (int i = 0; i < length; i++)
+			list.add(array[i]);
+		return list;
+	}
+
+	private ArrayList<Integer> intArray2ArrayList(int[] array) {
+		return intArray2ArrayList(array, array.length);
 	}
 
 }
