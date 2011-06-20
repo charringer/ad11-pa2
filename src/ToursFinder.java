@@ -2,6 +2,7 @@ package ads1ss11.pa2;
 
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * In dieser Klasse m&uuml;ssen Sie Ihre Algorithmen implementieren.
@@ -26,7 +27,8 @@ public class ToursFinder extends AbstractToursFinder {
 
 	private int[][] weightTable = null;
 	private boolean[][] usedEdge = null;
-	private int N = 0;
+
+	private int[][] twoOptTour = null;
 
 	/**
 	 * Der Konstruktor f&uuml;r das <code>ToursFinder</code>-Objekt.
@@ -53,14 +55,13 @@ public class ToursFinder extends AbstractToursFinder {
 		super(numNodes, edges);
 		buildWeightTable();
 		setAllEdgesUnused();
-		N = numNodes;
 	}
 
 	@Override
 	public ArrayList<ArrayList<Integer>> findTours1() {
 		int[][] tourArr = brainlessDivision();
 
-		//Main.printDebug("brainless gets "+totalWeight(tourArr));
+		Main.printDebug("brainless gets "+totalWeight(tourArr));
 
 		setAllEdgesUnused();
 		setEdgesUsed(tourArr[0]);
@@ -70,18 +71,34 @@ public class ToursFinder extends AbstractToursFinder {
 			twoOpt(tourArr[0]);
 			twoOpt(tourArr[1]);
 			newWeight = totalWeight(tourArr);
-			//Main.printDebug("2-opt gets "+newWeight);
+			Main.printDebug("2-opt gets "+newWeight);
 			if (newWeight == oldWeight)
 				break;
 			oldWeight = newWeight;
 		}
+		twoOptTour = tourArr;
 
 		return intArrayArray2ArrayListOfArrayList(tourArr);
 	}
 
 	@Override
 	public ArrayList<ArrayList<Integer>> findTours2() {
-		return null;
+		int[][] tourArr = twoOptTour;
+
+		Main.printDebug("starting with tour of weight "+totalWeight(tourArr));
+
+		int oldWeight = -1, newWeight = -2;
+		while (true) {
+			threeOpt(tourArr[0]);
+			threeOpt(tourArr[1]);
+			newWeight = totalWeight(tourArr);
+			Main.printDebug("3-opt gets "+newWeight);
+			if (newWeight == oldWeight)
+				break;
+			oldWeight = newWeight;
+		}
+
+		return intArrayArray2ArrayListOfArrayList(tourArr);
 	}
 
 	@Override
@@ -105,6 +122,106 @@ public class ToursFinder extends AbstractToursFinder {
 		return new int[][]{tour1, tour2};
 	}
 
+	/* adapted 3-opt algorithm */
+	private void threeOpt(int[] tour) {
+		for (int i=0;i<numNodes;i++) {
+			for (int j=i+2;j<numNodes;j++) {
+				for (int k=j+2;k<numNodes&&(i>0||k<numNodes-1);k++) {
+					threeOptThreeNodes(tour, new int[]{i, j, k});
+				}
+			}
+		}
+	}
+
+	private int[][] threePermutations = new int[][]{
+		new int[]{0,1, 2,3, 4,5}, // identity
+		new int[]{0,2, 1,4, 3,5},
+
+		//new int[]{0,2, 1,4, 3,5},
+		//new int[]{0,3, 4,2, 1,5},
+		//new int[]{0,4, 3,1, 2,5},
+		//new int[]{0,3, 4,1, 2,5}
+	};
+
+	/* 3-opt algorithm, part of the algorithm */
+	private void threeOptThreeNodes(int[] tour, int[] sel) {
+		int nodes[] = new int[]{
+			tour[sel[0]], tour[(sel[0]+1)%numNodes],
+			tour[sel[1]], tour[(sel[1]+1)%numNodes],
+			tour[sel[2]], tour[(sel[2]+1)%numNodes]
+		};
+		// find best permutation
+		int bestPermIdx = bestThreePerm(nodes);
+		// exchange nodes
+		if (bestPermIdx != 0)
+			doThreePerm(tour, sel, nodes, threePermutations[bestPermIdx]);
+	}
+
+	/* 3-opt algorithm, part of the algorithm */
+	private void doThreePerm(int[] tour, int[] sel, int[] nodes, int[] perm) {
+		// change used state
+		for (int i=0;i<3;i++) {
+			setEdgeUsed(nodes[2*i], nodes[2*i+1], false);
+		}
+		for (int i=0;i<3;i++) {
+			setEdgeUsed(nodes[perm[2*i]], nodes[perm[2*i+1]], true);
+		}
+		// determine what to flip
+		boolean flipAll = (perm[1]!=1 && perm[2]!=1);
+		boolean flipFirst = (perm[1]!=1 && perm[4]!=1);
+		boolean flipSecond = (perm[3]!=3 && perm[2]!=3);
+		//Main.printDebug("flip plan: "+flipFirst+" "+flipSecond+" "+flipAll);
+		// and flip it
+		if (flipFirst)
+			flip(tour, sel[0]+1, sel[1]+1);
+		if (flipSecond)
+			flip(tour, sel[1]+1, sel[2]+1);
+		if (flipAll)
+			flip(tour, sel[0]+1, sel[2]+1);
+	}
+
+	/* flip range from inclusively start to exlusively end */
+	private static void flip(int[] tour, int start, int end) {
+		for (int i=0; i<(end-start)/2; i++) {
+			int tmp = tour[start+i];
+			tour[start+i] = tour[end-1-i];
+			tour[end-1-i] = tmp;
+		}
+	}
+
+	/* 3-opt algorithm, find best possible permutation in threePermutations */
+	private int bestThreePerm(int[] nodes) {
+		int origWeight = -1;
+		int bestPerm = -1;
+		int bestWeight = Integer.MAX_VALUE;
+		for (int p = 0; p < threePermutations.length; p++) {
+			int[] perm = threePermutations[p];
+			boolean collision = false;
+			int curWeight = 0;
+			for (int i=0;i<3;i++) {
+				curWeight += weightTable[nodes[perm[2*i]]][nodes[perm[2*i+1]]];
+				if (p != 0 &&   usedEdge[nodes[perm[2*i]]][nodes[perm[2*i+1]]]) {
+					collision = true;
+					break;
+				}
+			}
+			if (p == 0)
+				origWeight = curWeight;
+			if (collision)
+				continue;
+			if (curWeight < bestWeight) {
+				bestWeight = curWeight;
+				bestPerm = p;
+			}
+		}
+		//if (bestPerm != 0) {
+		//	Main.printDebug("origWeight: "+origWeight+
+		//			" bestWeight: "+bestWeight+
+		//			" bestPerm: "+bestPerm);
+		//}
+		return bestPerm;
+	}
+
 	/* adapted 2-opt algorithm */
 	private void twoOpt(int[] tour) {
 		for (int i=0;i<numNodes;i++) {
@@ -124,9 +241,9 @@ public class ToursFinder extends AbstractToursFinder {
 	/* adapted 2-opt algorithm, part of the algorithm */
 	private boolean shouldExchange(int[] tour, int i, int j) {
 		int a = tour[i];
-		int b = tour[(i+1)%N];
+		int b = tour[(i+1)%numNodes];
 		int c = tour[j];
-		int d = tour[(j+1)%N];
+		int d = tour[(j+1)%numNodes];
 		if (isEdgeUsed(a,c) || isEdgeUsed(b,d))
 			return false;
 		int cur = weightTable[a][b] + weightTable[c][d];
@@ -139,18 +256,14 @@ public class ToursFinder extends AbstractToursFinder {
 	private void exchangeTwoEdges(int[] tour, int i, int j) {
 		//Main.printDebug("exchange "+i+" and "+j);
 		int a = tour[i];
-		int b = tour[(i+1)%N];
+		int b = tour[(i+1)%numNodes];
 		int c = tour[j];
-		int d = tour[(j+1)%N];
+		int d = tour[(j+1)%numNodes];
 		setEdgeUsed(a,b,false);
 		setEdgeUsed(c,d,false);
 		setEdgeUsed(a,c,true);
 		setEdgeUsed(b,d,true);
-		for (int k=0;k<(j-i)/2;k++) {
-			int tmp = tour[i+1+k];
-			tour[i+1+k] = tour[j-k];
-			tour[j-k] = tmp;
-		}
+		flip(tour, i+1, j+1);
 	}
 
 	/* get total weight of one tour, given an array of nodes */
