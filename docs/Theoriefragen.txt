@@ -1,0 +1,15 @@
+== exakt durch Enumeration
+n!/2
+
+== Laufzeit meines Algorithmus
+Wir sprechen hier nur von der Ordnung.
+doThreePerm...N
+threeOpt......N^3 * doThreePerm = N^4
+findTours2....f(N) * threeOpt = f(N)*N^4
+f(N) := Anzahl, wie oft man durch threeOpt verbessern kann.
+Annahme: f(N) liegt zwischen 1 und N.
+Gesamtkomplexität: zwischen N^4 und N^5.
+
+== Korrektheit
+brainlessDivision liefert eine gültige Lösung, twoOpt und threeOpt weichen
+mithilfe der usedEdge-Tabelle nie von der Gültigkeit ab.

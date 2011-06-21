@@ -1,0 +1,14 @@
+testdata    | good | shit
+0000        | 4991 | 5322
+0001        | 8098 | 8706
+0002        | 6780 | 7226
+0003        | 7097 | 7748
+0004        | 7537 | 8058
+0014        | 5960 | 6518
+my_hexagon  | 660  | 660
+my_pentagon | 105  | 105
+
+good...3-opt after 2-opt after brainlessDivision
+shit...same, but 3-opt knows just one possibility to swap
+
+See commit ffe0bd407db045b9755b9c3450797937e0f8a9a0.
