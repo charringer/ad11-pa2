@@ -136,11 +136,9 @@ public class ToursFinder extends AbstractToursFinder {
 	private int[][] threePermutations = new int[][]{
 		new int[]{0,1, 2,3, 4,5}, // identity
 		new int[]{0,2, 1,4, 3,5},
-
-		//new int[]{0,2, 1,4, 3,5},
-		//new int[]{0,3, 4,2, 1,5},
-		//new int[]{0,4, 3,1, 2,5},
-		//new int[]{0,3, 4,1, 2,5}
+		new int[]{0,3, 4,2, 1,5},
+		new int[]{0,4, 3,1, 2,5},
+		new int[]{0,3, 4,1, 2,5}
 	};
 
 	/* 3-opt algorithm, part of the algorithm */
