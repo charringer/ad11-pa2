@@ -168,7 +168,6 @@ public class ToursFinder extends AbstractToursFinder {
 		boolean flipAll = (perm[1]!=1 && perm[2]!=1);
 		boolean flipFirst = (perm[1]!=1 && perm[4]!=1);
 		boolean flipSecond = (perm[3]!=3 && perm[2]!=3);
-		//Main.printDebug("flip plan: "+flipFirst+" "+flipSecond+" "+flipAll);
 		// and flip it
 		if (flipFirst)
 			flip(tour, sel[0]+1, sel[1]+1);
@@ -212,11 +211,6 @@ public class ToursFinder extends AbstractToursFinder {
 				bestPerm = p;
 			}
 		}
-		//if (bestPerm != 0) {
-		//	Main.printDebug("origWeight: "+origWeight+
-		//			" bestWeight: "+bestWeight+
-		//			" bestPerm: "+bestPerm);
-		//}
 		return bestPerm;
 	}
 
@@ -246,13 +240,11 @@ public class ToursFinder extends AbstractToursFinder {
 			return false;
 		int cur = weightTable[a][b] + weightTable[c][d];
 		int alt = weightTable[a][c] + weightTable[b][d];
-		//if (alt < cur) Main.printDebug("exchecker: alt="+alt+" < "+cur+"=cur");
 		return alt < cur;
 	}
 
 	/* adapted 2-opt algorithm, part of the algorithm */
 	private void exchangeTwoEdges(int[] tour, int i, int j) {
-		//Main.printDebug("exchange "+i+" and "+j);
 		int a = tour[i];
 		int b = tour[(i+1)%numNodes];
 		int c = tour[j];
