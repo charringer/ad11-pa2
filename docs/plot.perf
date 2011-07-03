@@ -1,0 +1,26 @@
+# darstellbar mittels bargraphgen, siehe:
+# http://code.google.com/p/bargraphgen/
+
+=cluster;obere Schranke;2-Opt-Algorithmus;3-Opt-Algorithmus
+colors=yellow,light_blue,light_green
+=table
+yformat=%g
+=norotate
+ylabel=Länge der Tour
+
+# limit 2opt 3opt
+0 7817 5385 4991
+1 11290 9772 8098
+2 11529 10499 6780
+3 12565 10786 7097
+4 11694 9381 7537
+5 13103 11327 7327
+6 10899 9716 6653
+7 10614 8041 6157
+8 10572 8789 7423
+9 9442 8215 5980
+10 11683 8180 6715
+11 9594 7144 6505
+12 7817 5385 4991
+13 12295 10868 7166
+14 10003 7844 5960
